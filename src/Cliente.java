@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
@@ -9,13 +11,23 @@ public class Cliente {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Cliente Iniciado\n");
         while (true) {
             System.out.print("Informe o caminho do arquivo: ");
             String caminhoArquivo = scanner.nextLine();
 
             String[] partesCaminho = caminhoArquivo.split("\\\\");
+            byte[] bytes = null;
 
-            byte[] bytes = Files.readAllBytes(Paths.get(caminhoArquivo));
+            try {
+                bytes = Files.readAllBytes(Paths.get(caminhoArquivo));
+            } catch (NoSuchFileException e) {
+                System.out.println("Arquivo não encontrado");
+                continue;
+            } catch (InvalidPathException e) {
+                System.out.println("O caminho do arquivo é inválido");
+                continue;
+            }
 
             Arquivo arquivo = new Arquivo();
             arquivo.setConteudo(bytes);
@@ -42,7 +54,7 @@ public class Cliente {
                 bufferedOutputStream.close();
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("A conexão com o servidor não pôde ser efetuada");
             }
         }
     }

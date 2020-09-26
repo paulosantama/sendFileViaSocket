@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Connection extends Thread {
 
@@ -12,8 +13,9 @@ public class Connection extends Thread {
 
     @Override
     public void run() {
+        PrintWriter pout = null;
         try {
-            PrintWriter pout = new PrintWriter(outputLine.getOutputStream(), true);
+            pout = new PrintWriter(outputLine.getOutputStream(), true);
 
             byte[] objectAsByte = new byte[outputLine.getReceiveBufferSize()];
             BufferedInputStream bf = new BufferedInputStream(outputLine.getInputStream());
@@ -21,16 +23,26 @@ public class Connection extends Thread {
 
             Arquivo arquivo = (Arquivo) getObjectFromByte(objectAsByte);
             String dir = pastaArquivosServidor + arquivo.getNome();
-            System.out.println("Escrevendo arquivo " + dir);
 
+            System.out.println("Armazenando arquivo " + dir);
             FileOutputStream fos = new FileOutputStream(dir);
             fos.write(arquivo.getConteudo());
             fos.close();
 
             pout.println("O arquivo " + arquivo.getNome() + " foi salvo com sucesso no servidor.");
             outputLine.close();
+        } catch (SocketException e) {
+            String msgErro = "Não foi possível receber as informações no servidor (Socket)";
+            System.out.println(msgErro);
+            if (pout != null) {
+                pout.println(msgErro);
+            }
         } catch (IOException e) {
-            System.out.println("Problema de IO");
+            String msgErro = "Problema na comunicação";
+            System.out.println(msgErro);
+            if (pout != null) {
+                pout.println(msgErro);
+            }
         }
     }
 
