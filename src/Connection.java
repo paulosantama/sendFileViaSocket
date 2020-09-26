@@ -4,7 +4,8 @@ import java.net.SocketException;
 
 public class Connection extends Thread {
 
-    static private final String pastaArquivosServidor = "E:\\Pontificia Universidade Catolica de Goias\\10_periodo\\Sistemas Distribuídos\\N1\\Trabalho\\data\\servidor\\";
+//    static private final String pastaArquivosServidor = "E:\\Pontificia Universidade Catolica de Goias\\10_periodo\\Sistemas Distribuídos\\N1\\Trabalho\\data\\servidor\\";
+    static private final String pastaArquivosServidor = "/mnt/e/Pontificia Universidade Catolica de Goias/10_periodo/Sistemas Distribuídos/N1/Trabalho/data/servidor/";
     private final Socket outputLine;
 
     Connection(Socket socket) {

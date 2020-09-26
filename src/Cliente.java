@@ -9,14 +9,24 @@ import java.util.Scanner;
 public class Cliente {
 
     private static final Scanner scanner = new Scanner(System.in);
+//    private static final String regexSplitFileName = "\\\\";
+    private static final String regexSplitFileName = "/";
 
     public static void main(String[] args) throws IOException {
+        if (args.length < 2) {
+            System.out.println("Erro: Necessário informar o IP e a porta do servidor");
+            return;
+        }
+
+        String ipServidor = args[0];
+        int portaServidor = Integer.parseInt(args[1]);
+
         System.out.println("Cliente Iniciado\n");
         while (true) {
             System.out.print("Informe o caminho do arquivo: ");
             String caminhoArquivo = scanner.nextLine();
 
-            String[] partesCaminho = caminhoArquivo.split("\\\\");
+            String[] partesCaminho = caminhoArquivo.split(regexSplitFileName);
             byte[] bytes = null;
 
             try {
@@ -24,7 +34,7 @@ public class Cliente {
             } catch (NoSuchFileException e) {
                 System.out.println("Arquivo não encontrado");
                 continue;
-            } catch (InvalidPathException e) {
+            } catch (InvalidPathException | IOException e) {
                 System.out.println("O caminho do arquivo é inválido");
                 continue;
             }
@@ -39,7 +49,7 @@ public class Cliente {
             objectOutputStream.writeObject(arquivo);
 
             try {
-                Socket socket = new Socket("127.0.0.1", 5566);
+                Socket socket = new Socket(ipServidor, portaServidor);
 
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
                 bufferedOutputStream.write(byteArrayOutputStream.toByteArray());
