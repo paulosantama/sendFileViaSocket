@@ -12,10 +12,12 @@ public class Servidor {
 
         int portaServidor = Integer.parseInt(args[0]);
 
-        System.out.println("Servidor Iniciado");
+        System.out.println("Servidor Iniciado\n");
+        System.out.println("Escutando na porta "+args[0]);
+
         try {
             ServerSocket srvSocket = new ServerSocket(portaServidor);
-            System.out.println("Aguardando envio de arquivo ...");
+            System.out.println("Aguardando...");
             while (true) {
                 Socket client = srvSocket.accept();
 

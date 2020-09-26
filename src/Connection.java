@@ -4,17 +4,19 @@ import java.net.SocketException;
 
 public class Connection extends Thread {
 
-//    static private final String pastaArquivosServidor = "E:\\Pontificia Universidade Catolica de Goias\\10_periodo\\Sistemas Distribuídos\\N1\\Trabalho\\data\\servidor\\";
-    static private final String pastaArquivosServidor = "/mnt/e/Pontificia Universidade Catolica de Goias/10_periodo/Sistemas Distribuídos/N1/Trabalho/data/servidor/";
     private final Socket outputLine;
+
+    PrintWriter pout = null;
+
+    ArquivoService arquivoService;
 
     Connection(Socket socket) {
         outputLine = socket;
+        arquivoService = new ArquivoService();
     }
 
     @Override
     public void run() {
-        PrintWriter pout = null;
         try {
             pout = new PrintWriter(outputLine.getOutputStream(), true);
 
@@ -22,15 +24,10 @@ public class Connection extends Thread {
             BufferedInputStream bf = new BufferedInputStream(outputLine.getInputStream());
             bf.read(objectAsByte);
 
-            Arquivo arquivo = (Arquivo) getObjectFromByte(objectAsByte);
-            String dir = pastaArquivosServidor + arquivo.getNome();
+            Requisicao requisicao = (Requisicao) getObjectFromByte(objectAsByte);
 
-            System.out.println("Armazenando arquivo " + dir);
-            FileOutputStream fos = new FileOutputStream(dir);
-            fos.write(arquivo.getConteudo());
-            fos.close();
+            analisarRota(requisicao);
 
-            pout.println("O arquivo " + arquivo.getNome() + " foi salvo com sucesso no servidor.");
             outputLine.close();
         } catch (SocketException e) {
             String msgErro = "Não foi possível receber as informações no servidor (Socket)";
@@ -64,5 +61,38 @@ public class Connection extends Thread {
         }
 
         return obj;
+    }
+
+    private void prepararSalvarArquivo(Requisicao requisicao) {
+        try {
+            Arquivo arquivo = (Arquivo) requisicao.getBody();
+            arquivoService.salvarArquivo(arquivo);
+            pout.println("O arquivo " + arquivo.getNome() + " foi salvo com sucesso no servidor.");
+        } catch (IOException e) {
+            pout.println("Erro ao salvar arquivo");
+        }
+    }
+
+    private void analisarRota(Requisicao requisicao) {
+        String[] rota = requisicao.getAction().split("/");
+        switch (rota[0]) {
+            case "file" :
+                switch (rota[1]) {
+                    case "send" :
+                        prepararSalvarArquivo(requisicao);
+                        break;
+                    default:
+                        retornaRotaNaoEncontrada();
+                        break;
+                }
+                break;
+            default:
+                retornaRotaNaoEncontrada();
+                break;
+        }
+    }
+
+    private void retornaRotaNaoEncontrada() {
+        pout.println("Rota não encontrada");
     }
 }

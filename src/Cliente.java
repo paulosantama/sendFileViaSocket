@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class Cliente {
 
     private static final Scanner scanner = new Scanner(System.in);
-//    private static final String regexSplitFileName = "\\\\";
-    private static final String regexSplitFileName = "/";
+    private static final String regexSplitFileName = "\\\\"; // (Windows)
+//    private static final String regexSplitFileName = "/"; // (Linux)
 
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
@@ -22,6 +22,8 @@ public class Cliente {
         int portaServidor = Integer.parseInt(args[1]);
 
         System.out.println("Cliente Iniciado\n");
+        System.out.println("Servidor: "+ipServidor+":"+args[1]+"\n");
+
         while (true) {
             System.out.print("Informe o caminho do arquivo: ");
             String caminhoArquivo = scanner.nextLine();
@@ -43,10 +45,15 @@ public class Cliente {
             arquivo.setConteudo(bytes);
             arquivo.setNome(partesCaminho[partesCaminho.length - 1]);
 
+            Requisicao requisicao = new Requisicao();
+            requisicao.setTipoRequisicao(TipoRequisicao.PUT);
+            requisicao.setAction("file/send");
+            requisicao.setBody(arquivo);
+
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream;
             objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(arquivo);
+            objectOutputStream.writeObject(requisicao);
 
             try {
                 Socket socket = new Socket(ipServidor, portaServidor);
