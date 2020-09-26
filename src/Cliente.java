@@ -6,6 +6,24 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+/**
+ * Cliente de envio de arquivos para servidor via socket.
+ *
+ * O cliente se comunica com o servidor via socket por meio de <code>Requisicao</code>.
+ *
+ * Mensagens:
+ *
+ *  Para enviar um arquivo para o servidor deve ser enviada a seguinte requisição:
+ *  Requisicao(
+ *      tipoRequisicao = <code>TipoRequisicao.PUT</code>
+ *      action = "file/send"
+ *      body = <code>Arquivo</code> que deverá ser enviado
+ *  )
+ *
+ * @see Requisicao
+ * @see TipoRequisicao
+ * @see Arquivo
+ */
 public class Cliente {
 
     private static final Scanner scanner = new Scanner(System.in);
